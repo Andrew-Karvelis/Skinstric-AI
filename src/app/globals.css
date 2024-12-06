@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font-face definitions for your custom fonts */
+@font-face {
+  font-family: 'Roobert-Regular';
+  src: url('/fonts/Roobert-Regular.woff2') format('woff2'),
+       url('/fonts/Roobert-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roobert-SemiBold';
+  src: url('/fonts/Roobert-SemiBold.woff2') format('woff2'),
+       url('/fonts/Roobert-SemiBold.woff') format('woff');
+  font-weight: 500; /* SemiBold */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL-Regular';
+  src: url('/fonts/RoobertTRIAL-Regular.woff2') format('woff2'),
+       url('/fonts/RoobertTRIAL-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL-SemiBold';
+  src: url('/fonts/RoobertTRIAL-SemiBold.woff2') format('woff2'),
+       url('/fonts/RoobertTRIAL-SemiBold.woff') format('woff');
+  font-weight: 500; /* SemiBold */
+  font-style: normal;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -17,5 +50,10 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Roobert-Regular', Arial, Helvetica, sans-serif; /* Default to Regular */
+}
+
+/* Example: Applying SemiBold font to headings */
+h1, h2, h3 {
+  font-family: 'Roobert-SemiBold', sans-serif; /* Apply SemiBold font */
 }
