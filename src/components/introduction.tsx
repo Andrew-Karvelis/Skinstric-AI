@@ -9,6 +9,12 @@ const Introduction = () => {
 
   return (
     <div className="relative flex h-screen w-full flex-col justify-center items-center">
+      <div className="absolute w-full h-full">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-dotted border-2 border-black w-[30%] h-[60%] slow-rotate-1 opacity-5"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-dotted border-2 border-black w-[33%] h-[63%] slow-rotate-2 opacity-15"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-dotted border-2 border-black w-[36%] h-[66%] slow-rotate-3 opacity-25"></div>
+      </div>
+
       <div className="flex flex-col items-center">
         {/* Custom Placeholder */}
         {isFocused ? (
