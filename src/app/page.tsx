@@ -3,6 +3,9 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-   <Introduction />
+    <>
+      <span className="absolute top-5 left-5 font-bold text-xs">SKINSTRIC</span>
+      <Introduction />
+    </>
   );
 }
