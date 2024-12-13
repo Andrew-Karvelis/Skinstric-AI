@@ -1,42 +1,87 @@
 import React, { useState, useRef, useEffect } from "react";
 
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 interface InputFieldProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  currentQuestionIndex: number;
 }
 
-const InputField: React.FC<InputFieldProps> = ({ label, value, onChange }) => {
+const InputField: React.FC<InputFieldProps> = ({ 
+  label, 
+  value, 
+  onChange, 
+  currentQuestionIndex 
+}) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [location, setLocation] = useState("");
   const autocompleteRef = useRef<HTMLInputElement | null>(null);
+  const autocompleteInstance = useRef<any>(null);
 
-  // Function to load Google Maps API script dynamically
+  const initAutocomplete = () => {
+    if (!autocompleteRef.current || !window.google) return;
+
+    try {
+      autocompleteInstance.current = new window.google.maps.places.Autocomplete(
+        autocompleteRef.current,
+        {
+          types: ["(cities)"], // Restrict to cities only
+          fields: ["formatted_address"], // Only get the address
+        }
+      );
+
+      autocompleteInstance.current.addListener("place_changed", () => {
+        const place = autocompleteInstance.current.getPlace();
+        if (place?.formatted_address) {
+          onChange(place.formatted_address);
+        }
+      });
+    } catch (error) {
+      console.error("Error initializing autocomplete:", error);
+    }
+  };
+
   const loadGoogleMapsScript = () => {
+    if (document.querySelector('script[src*="maps.googleapis.com/maps/api"]')) {
+      initAutocomplete();
+      return;
+    }
+
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&v=weekly`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
     script.async = true;
-    document.head.appendChild(script);
+    script.defer = true;
 
     script.onload = () => {
-      if (typeof window !== "undefined" && window.google) {
-        const autocomplete = new window.google.maps.places.Autocomplete(
-          autocompleteRef.current!,
-          { types: ["geocode"] }
-        );
-
-        autocomplete.addListener("place_changed", () => {
-          const place = autocomplete.getPlace();
-          setLocation(place.formatted_address || "");
-          onChange(place.formatted_address || "");  // Update parent component state with the selected location
-        });
-      }
+      initAutocomplete();
     };
+
+    document.head.appendChild(script);
+  };
+
+  const cleanupAutocomplete = () => {
+    if (autocompleteInstance.current) {
+      window.google.maps.event.clearInstanceListeners(autocompleteInstance.current);
+      autocompleteInstance.current = null;
+    }
   };
 
   useEffect(() => {
-    loadGoogleMapsScript(); // Load the Google Maps script when the component mounts
-  }, []);  // Empty dependency array ensures this runs once
+    if (currentQuestionIndex === 1) {
+      loadGoogleMapsScript();
+    } else {
+      cleanupAutocomplete();
+    }
+
+    return () => {
+      cleanupAutocomplete(); // Cleanup on unmount or when question changes
+    };
+  }, [currentQuestionIndex]);
 
   return (
     <div className="flex flex-col items-center">
@@ -45,17 +90,17 @@ const InputField: React.FC<InputFieldProps> = ({ label, value, onChange }) => {
       ) : (
         <div className="text-gray-500 mb-2">CLICK TO TYPE</div>
       )}
-
       <input
-        ref={autocompleteRef}
+        // Only apply ref for question 2
+        ref={currentQuestionIndex === 1 ? autocompleteRef : undefined}
         type="text"
         className="relative w-full max-w-lg text-5xl text-center text-black outline-none border-b-2 border-gray-500"
         value={value}
-        onChange={(e) => onChange(e.target.value)} // Handle typing in the input field
+        onChange={(e) => onChange(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        placeholder={isFocused && currentQuestionIndex === 1? "Enter a location": ""}
       />
-
       <span
         className={`absolute w-full max-w-lg text-5xl text-center p-8 pointer-events-none whitespace-nowrap ${
           isFocused || value ? "opacity-0" : "opacity-100"
