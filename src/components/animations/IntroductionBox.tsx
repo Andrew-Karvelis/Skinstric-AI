@@ -11,9 +11,11 @@ const IntroductionBox = ({
 
   useEffect(() => {
     const context = gsap.context(() => {
+      // Timeline for box-drawing animation
       const tl = gsap.timeline({
-        defaults: { duration: 1, ease: "linear" },
+        defaults: { duration: 1, ease: "ease" },
         onComplete: () => {
+          // Fade out box when animation completes
           gsap.to(boxRef.current, {
             opacity: 0,
             duration: 1,
@@ -22,28 +24,34 @@ const IntroductionBox = ({
           });
         },
       });
-  
-      // Step 1: Reveal the top side (top left to top right)
-      tl.to(boxRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", // Top side
+
+      // Set initial hidden state
+      gsap.set(boxRef.current, {
+        clipPath: "polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)", // Fully hidden
       });
-  
-      // Step 2: Reveal the right side (top right to bottom right)
+
+      // Step 1: Draw the top side (left to right)
       tl.to(boxRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 0%)", // Right side
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", // Top edge
       });
-  
-      // Step 3: Reveal the bottom side (bottom right to bottom left)
+
+      // Step 2: Draw the right side (top to bottom)
       tl.to(boxRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Bottom side
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 100% 100%)", // Right edge
       });
-  
-      // Step 4: Reveal the left side (bottom left to top left)
+
+      // Step 3: Draw the bottom side (right to left)
       tl.to(boxRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Left side (closure)
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Bottom edge
+      });
+
+      // Step 4: Draw the left side (bottom to top)
+      tl.to(boxRef.current, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Full box
       });
     }, containerRef);
-  
+
+    // Cleanup on unmount
     return () => context.revert();
   }, [onAnimationComplete]);
 
