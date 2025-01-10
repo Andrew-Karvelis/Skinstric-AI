@@ -41,7 +41,7 @@ const IntroductionBox = ({
       // Animate each box
       paths.forEach((path, i) => {
         if (path) {
-          gsap.set(path, { strokeDashoffset: "1 1" });
+          gsap.set(path, { strokeDashoffset: "1 4" });
           tl.to(
             path,
             {
@@ -50,7 +50,7 @@ const IntroductionBox = ({
               duration: 4,
               ease: "none",
             },
-            0
+          0
           );
         }
       });
@@ -64,10 +64,8 @@ const IntroductionBox = ({
       ref={containerRef}
       className="relative w-full h-full flex items-center justify-center"
     >
-      <svg
-        className="absolute w-[505px] h-[505px] rotate-45"
-        viewBox="0 0 520 520"
-      >
+      <svg className="absolute w-[505px] h-[505px] rotate-45"
+      viewBox="0 0 520 520">
         <rect
           ref={path1Ref}
           x="37.5"

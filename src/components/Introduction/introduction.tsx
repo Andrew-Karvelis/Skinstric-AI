@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import NavigationButtons from "./NavigationButtons";
 import InputField from "./InputField";
@@ -9,83 +9,115 @@ import GSAPAnimatedIntroduction from "../animations/GSAPAnimatedIntroduction";
 const Introduction = () => {
   const questions = ["Introduce yourself", "Where are you from?"];
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<string[]>(["", ""]);
   const [inputValue, setInputValue] = useState("");
   const [validLocation, setValidLocation] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Initialize input value with existing answer when mounting or changing questions
+  useEffect(() => {
+    setInputValue(answers[currentQuestionIndex] || "");
+  }, [currentQuestionIndex, answers]);
 
   const handleAnimationComplete = () => {
     setShowIntro(true);
   };
 
-  const validateInput = (input: string): string | undefined => {
+  const validateInput = (
+    input: string,
+    type: "text" | "location"
+  ): string | undefined => {
     const trimmedInput = input.trim();
-    if (trimmedInput && !/^[a-zA-Z\s]*$/.test(trimmedInput)) {
-      return "Invalid input pattern."; // Invalid input pattern
+    if (
+      type === "text" &&
+      (!trimmedInput || !/^[a-zA-Z\s]*$/.test(trimmedInput))
+    ) {
+      return "Invalid text pattern.";
     }
-    return undefined; // No error if input is valid
+    return undefined;
   };
 
-  const isValidInput = (input: string): boolean => {
-    return !validateInput(input); // Return true if no error message is returned
+  const isValidInput = (input: string, type: "text" | "location"): boolean => {
+    return !validateInput(input, type);
   };
 
-  const canProceed =
-    currentQuestionIndex === 0
-      ? isValidInput(inputValue) && inputValue.trim() !== "" // "Introduce yourself" validation
-      : validLocation; // "Where are you from?" validation based on Google Autocomplete
+  const canProceed = (): boolean => {
+    if (currentQuestionIndex === 0) {
+      return isValidInput(inputValue, "text") && inputValue.trim() !== "";
+    }
+    return validLocation;
+  };
 
   const onBack = () => {
-    // Decrease the index to go to the previous question or step
-    setCurrentQuestionIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-    setInputValue(""); // Optionally reset the input value when going back
+    if (currentQuestionIndex > 0) {
+      // Save current answer before going back
+      const updatedAnswers = [...answers];
+      updatedAnswers[currentQuestionIndex] = inputValue;
+      setAnswers(updatedAnswers);
+
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const submitUserData = async (name: string, location: string) => {
+    try {
+      const response = await fetch("/api/FES_Virtual_Internship_1/level2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          Location: location,
+          Image: "https://via.placeholder.com/150",
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        console.log(`SUCCESS: Added ${name} from ${location}`);
+      } else {
+        throw new Error("Failed to add user");
+      }
+    } catch (error) {
+      console.error("Error submitting user data:", error);
+      setErrorMessage("Failed to submit user data. Please try again.");
+    }
   };
 
   const onProceed = async () => {
-    if (!canProceed) {
-      // Show an error message if the input is invalid
-      alert("Please correct the input before proceeding.");
+    if (!canProceed()) {
+      setErrorMessage("Please correct the input before proceeding.");
       return;
     }
 
-    // Proceed to the next question
-    setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-    setInputValue(""); // Optionally reset the input field when moving to the next step
+    setErrorMessage(null);
 
-    // When reaching the second question ("Where are you from?"), ping the API with entered data
-    if (currentQuestionIndex === 0) {
-      const userName = answers[0] || inputValue;
-      const userLocation = inputValue;
+    // Always update the answers array with the current input
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentQuestionIndex] = inputValue;
+    setAnswers(updatedAnswers);
 
-      try {
-        const response = await fetch(
-          "https://wk7wmfz7x8.execute-api.us-east-2.amazonaws.com/live/FES_Virtual_Internship_1/level2",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: userName,
-              Location: userLocation,
-            }),
-          }
-        );
-
-        const result = await response.json();
-        console.log(result); // Log the response from the API
-
-        // Handle success (e.g., show a success message)
-        if (response.ok) {
-          alert(`SUCCESS: Added ${userName} from ${userLocation}`);
-        } else {
-          alert("Failed to add user. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error pinging the API:", error);
-        alert("Error occurred while sending data.");
-      }
+    if (currentQuestionIndex === questions.length - 1) {
+      // Submit data only after the last question
+      await submitUserData(updatedAnswers[0], updatedAnswers[1]);
+    } else {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
+  };
+
+  // Handle input changes
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    // Update answers in real-time as user types
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentQuestionIndex] = value;
+    setAnswers(updatedAnswers);
+  };
+
+  const showAnswers = () => {
+    console.log(answers);
   };
 
   return (
@@ -93,41 +125,47 @@ const Introduction = () => {
       {!showIntro && (
         <IntroductionBox onAnimationComplete={handleAnimationComplete} />
       )}
-
       {showIntro && (
         <GSAPAnimatedIntroduction isVisible={showIntro}>
-          {/* 1. Rotating boxes background */}
           <div className="absolute w-full h-full">
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-dotted border-2 border-black w-[475px] h-[475px] slow-rotate-1 opacity-30 overflow-hidden z-0 pointer-events-none"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-dotted border-2 border-black w-[490px] h-[490px] slow-rotate-2 opacity-20 overflow-hidden z-0 pointer-events-none"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-dotted border-2 border-black w-[505px] h-[505px] slow-rotate-3 opacity-10 overflow-hidden z-0 pointer-events-none"></div>
+            {["475px", "490px", "505px"].map((size, index) => (
+              <div
+                key={index}
+                className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-dotted border-2 border-black w-[${size}] h-[${size}] slow-rotate-${
+                  index + 1
+                } opacity-${
+                  30 - index * 10
+                } overflow-hidden z-0 pointer-events-none`}
+              ></div>
+            ))}
           </div>
 
-          {/* 2. Input Field */}
           <div className="flex flex-col items-center">
             {currentQuestionIndex === 0 ? (
               <InputField
                 label={questions[currentQuestionIndex]}
                 value={inputValue}
-                onChange={setInputValue}
-                errorMessage={validateInput(inputValue)}
+                onChange={handleInputChange}
+                errorMessage={validateInput(inputValue, "text")}
                 currentQuestionIndex={currentQuestionIndex}
               />
             ) : (
               <QuestionInput
                 label={questions[currentQuestionIndex]}
                 value={inputValue}
-                onChange={setInputValue}
+                onChange={handleInputChange}
                 setValidLocation={setValidLocation}
               />
             )}
+            {errorMessage && (
+              <p className="text-red-500 mt-2">{errorMessage}</p>
+            )}
           </div>
 
-          {/* 3. Navigation Buttons */}
           <NavigationButtons
             onBack={onBack}
             onProceed={onProceed}
-            canProceed={canProceed}
+            canProceed={canProceed()}
           />
         </GSAPAnimatedIntroduction>
       )}
