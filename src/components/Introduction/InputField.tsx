@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 
 interface InputFieldProps {
   label: string;
@@ -38,7 +38,7 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className="relative w-full max-w-lg text-5xl text-center text-black outline-none border-b-2 border-gray-500 bg-transparent z-20"
+        className="relative w-[475px] max-w-lg text-5xl text-center text-black outline-none border-b-2 border-gray-500 bg-transparent z-20"
         placeholder={
           isFocused && currentQuestionIndex === 1 ? "Enter a location" : ""
         }

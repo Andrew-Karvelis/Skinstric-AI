@@ -7,16 +7,29 @@ const IntroductionBox = ({
   onAnimationComplete: () => void;
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const boxRef = useRef<HTMLDivElement | null>(null);
+  const path1Ref = useRef<SVGRectElement | null>(null);
+  const path2Ref = useRef<SVGRectElement | null>(null);
+  const path3Ref = useRef<SVGRectElement | null>(null);
 
   useEffect(() => {
     const context = gsap.context(() => {
-      // Timeline for box-drawing animation
+      const paths = [path1Ref.current, path2Ref.current, path3Ref.current];
+      const sizes = [445, 475, 505]; // widths of each box
+
+      // Calculate perimeter for each box
+      const perimeters = sizes.map((size) => size * 4);
+
+      // Set initial state - hide the boxes
+      paths.forEach((path, i) => {
+        if (path) {
+          path.style.strokeDasharray = `${perimeters[i]}`;
+          path.style.strokeDashoffset = `${perimeters[i]}`;
+        }
+      });
+
       const tl = gsap.timeline({
-        defaults: { duration: 1, ease: "ease" },
         onComplete: () => {
-          // Fade out box when animation completes
-          gsap.to(boxRef.current, {
+          gsap.to(paths, {
             opacity: 0,
             duration: 1,
             delay: 0.3,
@@ -25,33 +38,24 @@ const IntroductionBox = ({
         },
       });
 
-      // Set initial hidden state
-      gsap.set(boxRef.current, {
-        clipPath: "polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)", // Fully hidden
-      });
-
-      // Step 1: Draw the top side (left to right)
-      tl.to(boxRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", // Top edge
-      });
-
-      // Step 2: Draw the right side (top to bottom)
-      tl.to(boxRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 100% 100%)", // Right edge
-      });
-
-      // Step 3: Draw the bottom side (right to left)
-      tl.to(boxRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Bottom edge
-      });
-
-      // Step 4: Draw the left side (bottom to top)
-      tl.to(boxRef.current, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Full box
+      // Animate each box
+      paths.forEach((path, i) => {
+        if (path) {
+          gsap.set(path, { strokeDashoffset: "1 1" });
+          tl.to(
+            path,
+            {
+              strokeDashoffset: 0,
+              strokeDasharray: `${perimeters[i]}`, // Maintain the dash pattern
+              duration: 4,
+              ease: "none",
+            },
+            0
+          );
+        }
       });
     }, containerRef);
 
-    // Cleanup on unmount
     return () => context.revert();
   }, [onAnimationComplete]);
 
@@ -60,13 +64,50 @@ const IntroductionBox = ({
       ref={containerRef}
       className="relative w-full h-full flex items-center justify-center"
     >
-      <div
-        ref={boxRef}
-        style={{
-          clipPath: "polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)", // Initial hidden state
-        }}
-        className="w-[550px] h-[550px] border-2 border-dotted border-black"
-      />
+      <svg
+        className="absolute w-[505px] h-[505px] rotate-45"
+        viewBox="0 0 520 520"
+      >
+        <rect
+          ref={path1Ref}
+          x="37.5"
+          y="37.5"
+          width="445"
+          height="445"
+          fill="none"
+          stroke="black"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeDasharray="1 4" // Dash pattern
+          opacity="0.3"
+        />
+        <rect
+          ref={path2Ref}
+          x="22.5"
+          y="22.5"
+          width="475"
+          height="475"
+          fill="none"
+          stroke="black"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeDasharray="1 4"
+          opacity="0.2"
+        />
+        <rect
+          ref={path3Ref}
+          x="7.5"
+          y="7.5"
+          width="505"
+          height="505"
+          fill="none"
+          stroke="black"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeDasharray="1 4"
+          opacity="0.1"
+        />
+      </svg>
     </div>
   );
 };
