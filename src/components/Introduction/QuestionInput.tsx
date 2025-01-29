@@ -17,8 +17,7 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
   const autocompleteRef = useRef<HTMLInputElement | null>(null);
   const autocompleteInstance = useRef<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isFocused, setIsFocused] = useState(false)
-
+  const [isFocused, setIsFocused] = useState(false);
 
   const loadGoogleMapsScript = () => {
     return new Promise<void>((resolve, reject) => {
@@ -26,19 +25,22 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
         'script[src*="maps.googleapis.com"]'
       );
       if (existingScript) {
+        // Wait for the existing script to load
+        existingScript.addEventListener("load", () => resolve());
         resolve();
-      } else {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
-        script.async = true;
-        script.defer = true;
-
-        script.onload = () => resolve();
-        script.onerror = () =>
-          reject(new Error("Error loading Google Maps API"));
-
-        document.head.appendChild(script);
+        return;
       }
+
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => resolve();
+      script.onerror = () =>
+        reject(new Error("Error loading Google Maps API"));
+
+      document.head.appendChild(script);
     });
   };
 
@@ -49,6 +51,9 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
     }
 
     if (!autocompleteRef.current) return;
+
+    // Prevent multiple instances of Autocomplete
+    if (autocompleteInstance.current) return;
 
     autocompleteInstance.current = new window.google.maps.places.Autocomplete(
       autocompleteRef.current,
@@ -79,13 +84,21 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
     };
 
     loadAndInit();
+
+    // Cleanup function to remove the autocomplete instance
+    return () => {
+      if (autocompleteInstance.current) {
+        // Remove all listeners and reset the instance
+        google.maps.event.clearInstanceListeners(autocompleteInstance.current);
+        autocompleteInstance.current = null;
+      }
+    };
   }, []);
 
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsFocused
     const inputValue = e.target.value;
     onChange(inputValue);
     setValidLocation(false); // Reset validity when the user types
@@ -94,16 +107,15 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
 
   const renderLabel = () => {
     return isFocused || value !== "" ? (
-      <div className="text-gray-500 mb-2">{label}</div>
+      <div className="text-gray-500 mb-2 text-center">{label}</div>
     ) : (
-      <div className="text-gray-500 mb-2">Click to type</div>
+      <div className="text-gray-500 mb-2 text-center">Click to type</div>
     );
   };
 
-
   return (
-    <>
-    {renderLabel()}
+    <div className="max-w-[475px] sm:max-w-[500px] flex flex-col items-center relative">
+      {renderLabel()}
       <input
         ref={autocompleteRef}
         type="text"
@@ -112,10 +124,10 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
         onBlur={handleBlur}
         onChange={handleChange}
         placeholder={isFocused ? "Enter a location" : "Where are you from?"}
-        className="w-full max-w-lg text-5xl text-center border-b-2 border-gray-500 outline-none bg-transparent z-20 placeholder-black focus:placeholder-gray-400"
+        className="sm:w-[475px] w-[240px] sm:text-5xl text-2xl text-center border-b-2 border-gray-500 outline-none bg-transparent z-20 placeholder-black focus:placeholder-gray-400"
       />
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-    </>
+    </div>
   );
 };
 

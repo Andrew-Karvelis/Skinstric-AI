@@ -29,7 +29,7 @@ const InputField: React.FC<InputFieldProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center max-w-[300px] sm:max-w-[500px] relative">
       {renderLabel()}
       <input
         ref={autoCompleteRef}
@@ -38,20 +38,20 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className="relative w-[475px] max-w-lg text-5xl text-center text-black outline-none border-b-2 border-gray-500 bg-transparent z-20"
+        className="relative sm:w-[475px] w-[200px] max-w-lg text-2xl sm:text-5xl text-center text-black outline-none border-b-2 border-gray-500 bg-transparent z-20"
         placeholder={
           isFocused && currentQuestionIndex === 1 ? "Enter a location" : ""
         }
       />
       <span
-        className={`absolute w-full max-w-lg text-5xl text-center p-8 pointer-events-none whitespace-nowrap ${
+        className={`absolute max-w-lg text-4xl sm:text-5xl text-center p-8 pointer-events-none whitespace-nowrap ${
           isFocused || value ? "opacity-0" : "opacity-100"
-        } transition-opacity 300ms ease-in-out`}
+        } transition-opacity duration-300 ease-in-out`}
       >
         {value || label}
       </span>
       {errorMessage && (
-        <div className="text-red-500 mt-2 text-sm">{errorMessage}</div>
+        <div className="absolute -bottom-8 text-red-500 mt-2 text-sm">{errorMessage}</div>
       )}
     </div>
   );
