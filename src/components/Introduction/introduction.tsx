@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useEffect, useState } from "react";
 import NavigationButtons from "./NavigationButtons";
 import InputField from "./InputField";
@@ -15,25 +15,12 @@ const Introduction = () => {
   const [showIntro, setShowIntro] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Add resize handler
   useEffect(() => {
-    const handleResize = () => {
-      // Force a re-render by updating a state
-      setShowIntro((prev) => prev);
-    };
-
-    // Add event listener with debounce
-    let timeoutId: NodeJS.Timeout;
-    const debouncedResize = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(handleResize, 100);
-    };
-
-    window.addEventListener("resize", debouncedResize);
-    return () => {
-      window.removeEventListener("resize", debouncedResize);
-      clearTimeout(timeoutId);
-    };
+    // Load saved state from local storage
+    const savedAnswers = localStorage.getItem("answers");
+    if (savedAnswers) {
+      setAnswers(JSON.parse(savedAnswers));
+    }
   }, []);
 
   useEffect(() => {
@@ -76,6 +63,8 @@ const Introduction = () => {
       updatedAnswers[currentQuestionIndex] = inputValue;
       setAnswers(updatedAnswers);
       setCurrentQuestionIndex(currentQuestionIndex - 1);
+      // Save state to local storage
+      localStorage.setItem("answers", JSON.stringify(updatedAnswers));
     }
   };
 
@@ -120,6 +109,8 @@ const Introduction = () => {
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
+    // Save state to local storage
+    localStorage.setItem("answers", JSON.stringify(updatedAnswers));
   };
 
   const handleInputChange = (value: string) => {
@@ -171,23 +162,15 @@ const Introduction = () => {
                       setValidLocation={setValidLocation}
                     />
                   )}
-
-                  {errorMessage && (
-                    <p className="text-red-500 text-center mt-4 ">
-                      {errorMessage}
-                    </p>
-                  )}
                 </div>
               </div>
 
-              {/* Navigation buttons - bottom */}
-              <div className="w-full sm:px-8 mb-8 mt-auto">
-                <NavigationButtons
-                  onBack={onBack}
-                  onProceed={onProceed}
-                  canProceed={canProceed()}
-                />
-              </div>
+              {/* Navigation Buttons */}
+              <NavigationButtons
+                onBack={onBack}
+                onProceed={onProceed}
+                canProceed={canProceed()}
+              />
             </div>
           </div>
         </GSAPAnimatedIntroduction>

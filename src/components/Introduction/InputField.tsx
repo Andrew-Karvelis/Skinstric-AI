@@ -44,7 +44,7 @@ const InputField: React.FC<InputFieldProps> = ({
         }
       />
       <span
-        className={`absolute max-w-lg text-4xl sm:text-5xl text-center p-8 pointer-events-none whitespace-nowrap ${
+        className={`absolute max-w-lg text-2xl sm:text-5xl text-center p-8 pointer-events-none whitespace-nowrap ${
           isFocused || value ? "opacity-0" : "opacity-100"
         } transition-opacity duration-300 ease-in-out`}
       >
