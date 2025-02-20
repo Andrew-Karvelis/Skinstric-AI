@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import NavigationButtons from "./NavigationButtons";
 import InputField from "./InputField";
 import IntroductionBox from "../animations/IntroductionBox";
@@ -7,6 +8,7 @@ import QuestionInput from "./QuestionInput";
 import GSAPAnimatedIntroduction from "../animations/GSAPAnimatedIntroduction";
 
 const Introduction = () => {
+  const router = useRouter();
   const questions = ["Introduce yourself", "Where are you from?"];
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>(["", ""]);
@@ -106,6 +108,7 @@ const Introduction = () => {
 
     if (currentQuestionIndex === questions.length - 1) {
       await submitUserData(updatedAnswers[0], updatedAnswers[1]);
+      router.push("/upload")
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
