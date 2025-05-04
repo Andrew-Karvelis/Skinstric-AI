@@ -23,7 +23,9 @@
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-router-dom": "^7.1.4",
-    "webpack": "^5.0.0"
+    "react-webcam": "^7.2.0",
+    "webpack": "^5.0.0",
+    "zustand": "^5.0.4"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "3.2.4",
