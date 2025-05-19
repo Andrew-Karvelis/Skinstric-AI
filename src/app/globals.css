@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font-face definitions for your custom fonts */
+@font-face {
+  font-family: 'Roobert-Regular';
+  src: url('/fonts/Roobert-Regular.woff2') format('woff2'),
+       url('/fonts/Roobert-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roobert-SemiBold';
+  src: url('/fonts/Roobert-SemiBold.woff2') format('woff2'),
+       url('/fonts/Roobert-SemiBold.woff') format('woff');
+  font-weight: 500; /* SemiBold */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL-Regular';
+  src: url('/fonts/RoobertTRIAL-Regular.woff2') format('woff2'),
+       url('/fonts/RoobertTRIAL-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RoobertTRIAL-SemiBold';
+  src: url('/fonts/RoobertTRIAL-SemiBold.woff2') format('woff2'),
+       url('/fonts/RoobertTRIAL-SemiBold.woff') format('woff');
+  font-weight: 500; /* SemiBold */
+  font-style: normal;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Roobert-Regular', Arial, Helvetica, sans-serif; /* Default to Regular */
+}
+
+/* Example: Applying SemiBold font to headings */
+h1, h2, h3 {
+  font-family: 'Roobert-SemiBold', sans-serif; /* Apply SemiBold font */
+}
+
+
+@keyframes slow-rotate-1 {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes slow-rotate-2 {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes slow-rotate-3 {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.slow-rotate-1 {
+  position: absolute;
+  animation: slow-rotate-1 80s linear infinite;
+  transform-origin: center;
+}
+
+.slow-rotate-2 {
+  position: absolute;
+  animation: slow-rotate-2 90s linear infinite;
+  transform-origin: center;
+}
+
+.slow-rotate-3 {
+  position: absolute;
+  animation: slow-rotate-3 100s linear infinite;
+  transform-origin: center;
+}
