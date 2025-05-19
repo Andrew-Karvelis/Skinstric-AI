@@ -4,11 +4,18 @@
     "next/typescript",
     "plugin:storybook/recommended",
     "eslint:recommended",
+    "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended"
   ],
+  "plugins": ["react", "@typescript-eslint"],
   "rules": {
     "@typescript-eslint/no-unused-expressions": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "react/react-in-jsx-scope": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }
